@@ -83,14 +83,13 @@ class Daemon(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return # log silently
 
-# TODO: refactor this to become part of a class
-stream = logging.StreamHandler(sys.stderr)
-stream.setFormatter(logging.Formatter("%(name)s: %(levelname)s: %(message)s"))
+logStream = logging.StreamHandler(sys.stderr)
+logStream.setFormatter(logging.Formatter("%(name)s: %(levelname)s: %(message)s"))
+logging.getLogger("codeintel").addHandler(logStream)
 logger = logging.getLogger("codeintel_server")
-logger.addHandler(stream)
-logger.setLevel(logging.DEBUG)
-logger.info("Hoi")
-logging.getLogger("codeintel").addHandler(stream)
+logger.addHandler(logStream)
+logger.setLevel(logging.WARNING)
+
 manager = Manager(
     # db_base_dir = path.join(CI_DIR, 'db'),
     # extra_module_dirs = [path.join(CI_DIR, 'codeintel2'),],
