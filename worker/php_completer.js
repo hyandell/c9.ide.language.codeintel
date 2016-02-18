@@ -14,10 +14,14 @@ handler.handlesLanguage = function(language) {
     return language === "php";
 };
 
-// Already defined in c9.ide.language.generic:
-//
-// handler.getIdentifierRegex
-// handler.getCompletionRegex
+handler.getIdentifierRegex = function() {
+    // Note: $$ indicates dollars are allowed at the start of variables
+    return (/[$$a-zA-Z0-9_\x7f-\xff]/);
+};
+
+handler.getCompletionRegex = function() {
+    return (/(\$|->|::)$/);
+};
 
 handler.getCacheCompletionRegex = function() {
      // Match strings that can be an expression or its prefix, i.e.
