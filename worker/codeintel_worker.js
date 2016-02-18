@@ -114,7 +114,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                     "-s", "--data-binary", "@-", // get input from stdin
                     "localhost:" + DAEMON_PORT + "?mode=" + command
                     + "&row=" + (pos.row + 1) + "&column=" + pos.column
-                    + "&path=" + path.replace(/^\//, ""),
+                    + "&path=" + encodeURIComponent(path.replace(/^\//, "")),
                 ],
             },
             function onResult(err, stdout, stderr, meta) {
