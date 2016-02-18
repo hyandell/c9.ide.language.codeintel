@@ -50,6 +50,8 @@ var server;
 var launchCommand;
 var showedJediError;
 var daemon;
+var lastInfoTimer;
+var lastInfoPopup;
 
 handler.handlesLanguage = function(language) {
     return language === "php";
@@ -186,8 +188,19 @@ function ensureDaemon(callback) {
             
             child.stderr.on("data", function(data) {
                 output += data;
-                if (/Daemon listening/.test(data))
+                if (/!!Daemon listening/.test(data))
                     done();
+                if (/!!Updating indexes for (.*)/.test(data)) {
+                    clearTimeout(lastInfoTimer);
+                    lastInfoTimer = setTimeout(function() {
+                        lastInfoPopup = workerUtil.showInfo("Updating indexes for " + RegExp.$1, -1);
+                    }, 3000);
+                }
+                if (/!!Updated indexes/.test(data)) {
+                    clearTimeout(lastInfoTimer);
+                    lastInfoPopup && lastInfoPopup.hide();
+                }
+                    
             });
             child.on("exit", function(code) {
                 if (code === ERROR_PORT_IN_USE) // someone else running daemon?

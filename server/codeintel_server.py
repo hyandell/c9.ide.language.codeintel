@@ -22,14 +22,16 @@ def main(args):
     try:
         server = HTTPServer(("localhost", int(args.port)), Daemon)
     except:
-        sys.stderr.write("Daemon unable to listen at :%s\n" % args.port)
+        sys.stderr.write("!!Daemon unable to listen at :%s\n" % args.port)
         sys.exit(98)
-    sys.stderr.write("Daemon listening at :%s\n" % args.port)
+    sys.stderr.write("!!Daemon listening at :%s\n" % args.port)
     server.serve_forever()
 
 def process(source, args):
     mode = args.get("mode")
     buffer, line, offset = process_input(source, args)
+    scan_workspace(buffer)
+    
     if mode == "completions":
         return json.dumps(get_completions(buffer, line, offset))
     
@@ -89,9 +91,18 @@ def process_input(source, args):
     lines = source.split('\n')
     line = lines[row]
     offset = sum([len(l) + 1 for l in lines[:row]]) + column
-    print offset
-    print source[offset-1]
     return buffer, line, offset
+
+def scan_workspace(buffer):
+    if not manager.is_citadel_lang(buffer.lang):
+        return
+    if not buffer.lang in scanned_langs:
+        sys.stderr.write("!!Updating indexes for " + buffer.lang + "\n")
+        scanned_langs.append(buffer.lang)
+        buffer.scan()
+        sys.stderr.write("!!Updated indexes for " + buffer.lang + "\n")
+    else:
+        buffer.scan()
 
 class LoggingEvalController(EvalController):
     def debug(self, msg, *args): logger.debug(msg, *args)
@@ -128,6 +139,7 @@ manager = Manager(
 )
 manager.upgrade()
 manager.initialize()
+scanned_langs = []
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run jedi functions as a daemon or via stdin")
