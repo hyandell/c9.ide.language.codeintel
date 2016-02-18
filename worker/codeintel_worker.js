@@ -132,7 +132,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                         daemon = null;
                         return callDaemon(command, path, doc, pos, options, callback);
                     }
-                    return callback(err);
+                    return callback(new Error("codeintel_server failed or not responding"));
                 }
                 
                 if (typeof stdout !== "object")
@@ -210,17 +210,17 @@ function ensureDaemon(callback) {
                 if (!code || /Daemon listening/.test(output)) // everything ok, try again later
                     daemon = null;
                 clearTimeout(killTimer);
-                done(code && new Error("[codeintel_worker] Daemon failed: " + output));
+                done(code && new Error("[codeintel_worker] Daemon failed: " + output), true);
             });
         }
     );
     
-    function done(err) {
+    function done(err, dontRetry) {
         if (err && /No module named codeintel/.test(err.message) && !showedJediError) {
             workerUtil.showError("CodeIntel package not found. Please run 'pip install codeintel' or 'sudo pip install codeintel' to enable code completion.");
             showedJediError = true;
         }
-        callback && callback(err);
+        callback && callback(err, dontRetry);
         callback = null;
     }
 }
