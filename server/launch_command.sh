@@ -19,9 +19,10 @@ elif which virtualenv &>/dev/null; then
 
     source $ENV/bin/activate
 
-    if ! python -c 'import jedi' &>/dev/null; then
-        echo "Installing python support dependencies"
-        pip install --upgrade jedi pylint pylint-flask pylint-django >&2
+    if ! python -c 'import codeintel' &>/dev/null; then
+        echo "!!Installing dependencies" >&2
+        pip install --upgrade codeintel >&2
+        echo "!!Done installing dependencies" >&2
     fi
 
     PYTHON=$ENV/bin/python

@@ -97,10 +97,10 @@ def scan_workspace(buffer):
     if not manager.is_citadel_lang(buffer.lang):
         return
     if not buffer.lang in scanned_langs:
-        sys.stderr.write("!!Updating indexes for " + buffer.lang + "\n")
+        sys.stderr.write("!!Updating " + buffer.lang + " indexes\n")
         scanned_langs.append(buffer.lang)
         buffer.scan()
-        sys.stderr.write("!!Updated indexes for " + buffer.lang + "\n")
+        sys.stderr.write("!!Done updating indexes\n")
     else:
         buffer.scan()
 
@@ -142,7 +142,7 @@ manager.initialize()
 scanned_langs = []
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run jedi functions as a daemon or via stdin")
+    parser = argparse.ArgumentParser(description="Run codeintel commands as a daemon or via stdin")
     parser.add_argument("mode", help="Mode of operation", choices=["daemon", "completions", "goto_definitions", "goto_assignments"])
     parser.add_argument("--row", type=int, help="The row to read from")
     parser.add_argument("--column", type=int, help="The column to read from")

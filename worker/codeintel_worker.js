@@ -48,7 +48,6 @@ var LANGUAGES = {
 var handler = module.exports = Object.create(baseHandler);
 var server;
 var launchCommand;
-var showedJediError;
 var daemon;
 var lastInfoTimer;
 var lastInfoPopup;
@@ -114,7 +113,8 @@ function callDaemon(command, path, doc, pos, options, callback) {
                     "-s", "--data-binary", "@-", // get input from stdin
                     "localhost:" + DAEMON_PORT + "?mode=" + command
                     + "&row=" + (pos.row + 1) + "&column=" + pos.column
-                    + "&path=" + encodeURIComponent(path.replace(/^\//, "")),
+                    + "&path=" + encodeURIComponent(path.replace(/^\//, ""))
+                    + (options.noDoc ? "&nodoc=1" : ""),
                 ],
             },
             function onResult(err, stdout, stderr, meta) {
@@ -130,7 +130,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                     return callback(new Error("Couldn't parse codeintel output: " + stdout));
                 
                 console.log("[codeintel_worker] " + command + " in " + (Date.now() - start)
-                    + "ms (jedi: " + meta.serverTime + "ms): "
+                    + "ms (ci: " + meta.serverTime + "ms): "
                     + doc.getLine(pos.row).substr(0, pos.column));
 
                 callback(null, stdout, meta);
@@ -181,21 +181,21 @@ function ensureDaemon(callback) {
                 output += data;
                 if (/!!Daemon listening/.test(data))
                     done();
-                else if (/!!Updating indexes for (.*)/.test(data)) {
+                else if (/!!(Updating|Installing)/.test(data)) {
                     clearTimeout(lastInfoTimer);
                     lastInfoTimer = setTimeout(function() {
-                        lastInfoPopup = workerUtil.showInfo("Updating indexes for " + RegExp.$1, -1);
+                        lastInfoPopup = workerUtil.showInfo(RegExp.$1, -1);
                     }, 3000);
                 }
-                else if (/!!Updated indexes/.test(data)) {
-                    clearTimeout(lastInfoTimer);
-                    lastInfoPopup && lastInfoPopup.hide();
+                else if (/!!Done/.test(data)) {
+                    clearInfoPopup();
                 }
                 else if (/^!!/.test(data)) {
                     workerUtil.showError(data);
                 }
             });
             child.on("exit", function(code) {
+                clearInfoPopup();
                 if (code === ERROR_PORT_IN_USE) // someone else running daemon?
                     return done(null, true);
                 if (!code || /Daemon listening/.test(output)) // everything ok, try again later
@@ -206,11 +206,12 @@ function ensureDaemon(callback) {
         }
     );
     
+    function clearInfoPopup() {
+        clearTimeout(lastInfoTimer);
+        lastInfoPopup && lastInfoPopup.hide();
+    }
+    
     function done(err, dontRetry) {
-        if (err && /No module named codeintel/.test(err.message) && !showedJediError) {
-            workerUtil.showError("CodeIntel package not found. Please run 'pip install codeintel' or 'sudo pip install codeintel' to enable code completion.");
-            showedJediError = true;
-        }
         callback && callback(err, dontRetry);
         callback = null;
     }
