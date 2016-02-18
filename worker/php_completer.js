@@ -14,28 +14,27 @@ handler.handlesLanguage = function(language) {
     return language === "php";
 };
 
-/* already defined in c9.ide.language.generic
-handler.getIdentifierRegex = function() {
-    // Note: $$ indicates dollars are allowed at the start of variables
-    return (/[$$a-zA-Z0-9_\x7f-\xff]/);
-};
-
-handler.getCompletionRegex = function() {
-    return (/\$/);
-};
-*/
+// Already defined in c9.ide.language.generic:
+//
+// handler.getIdentifierRegex
+// handler.getCompletionRegex
 
 handler.getCacheCompletionRegex = function() {
      // Match strings that can be an expression or its prefix, i.e.
      // keywords/identifiers followed by whitespace and/or operators
-    return / ?(\b\w+\s+|\b(if|while|for|print)\s*\(|([{[\-+*%<>!|&/,%]|==|!=)\s*)*/;
+    return new RegExp(
+        // 'if/while/for ('
+        "(\\b(if|while|for|switch)\\s*\\("
+        // other identifiers and keywords without (
+        + "|\\b\\w+\\s+"
+        // equality operators, operators such as + and -,
+        // and opening brackets { and [
+        + "|(===?|!==?|[-+]=|[-+*%>?!|&{[])"
+        // spaces
+        + "|\\s)+"
+    );
 };
 
-/**
- * Predict how to complete code next. Did the user just type 'mat'?
- * Then we probably only have a completion 'math'. So we can predict
- * that the user may type 'math.' next and precompute completions.
- */
 handler.predictNextCompletion = function(doc, fullAst, pos, options, callback) {
     /*
     if (!options.matches.length) {
@@ -46,10 +45,9 @@ handler.predictNextCompletion = function(doc, fullAst, pos, options, callback) {
     }
     */
     var predicted = options.matches.filter(function(m) {
-        return m.isContextual
-            && m.icon !== "method";
+        return m.isContextual;
     });
-    if (predicted.length !== 1)
+    if (predicted.length !== 1 || predicted[0].icon === "method")
         return callback();
     console.log("[php_completer] Predicted our next completion will be for " + predicted[0].replaceText + ".");
     callback(null, {
