@@ -4,13 +4,13 @@ set -e
 
 COMMAND=$1
 
-SHAREDENV="/mnt/shared/lib/$PYTHON"
-FALLBACKENV="$HOME/.c9/$PYTHON"
+SHAREDENV="/mnt/shared/lib/python"
+FALLBACKENV="$HOME/.c9/python"
 
 if [[ -d $SHAREDENV ]]; then
     ENV=$SHAREDENV
     source $ENV/bin/activate
-    PYTHON="$ENV/bin/$PYTHON"
+    PYTHON="$ENV/bin/python"
 elif which virtualenv &>/dev/null; then
     ENV=$FALLBACKENV
     if ! [[ -d $ENV ]]; then
@@ -24,7 +24,7 @@ elif which virtualenv &>/dev/null; then
         pip install --upgrade jedi pylint pylint-flask pylint-django >&2
     fi
 
-    PYTHON=$ENV/bin/$PYTHON
+    PYTHON=$ENV/bin/python
 else
     echo "!!Code completion fatal error: virtualenv not installed, try 'pip install virtualenv' or 'sudo pip install virtualenv'" >&2
     exit 1

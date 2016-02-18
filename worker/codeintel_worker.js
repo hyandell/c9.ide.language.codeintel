@@ -209,7 +209,7 @@ function ensureDaemon(callback) {
                 if (!code || /Daemon listening/.test(output)) // everything ok, try again later
                     daemon = null;
                 clearTimeout(killTimer);
-                done(code && new Error("[python_completer] Daemon failed: " + output));
+                done(code && new Error("[codeintel_worker] Daemon failed: " + output));
             });
         }
     );
