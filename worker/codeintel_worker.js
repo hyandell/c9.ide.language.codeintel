@@ -104,7 +104,7 @@ handler.jumpToDefinition = function(doc, fullAst, pos, options, callback) {
 };
 
 /**
- * Invoke a function on our jedi python daemon. It runs as an HTTP daemon
+ * Invoke a function on our completer daemon. It runs as an HTTP daemon
  * so we use curl to send a request.
  */
 function callDaemon(command, path, doc, pos, options, callback) {
@@ -135,9 +135,9 @@ function callDaemon(command, path, doc, pos, options, callback) {
                 }
                 
                 if (typeof stdout !== "object")
-                    return callback(new Error("Couldn't parse python-jedi output: " + stdout));
+                    return callback(new Error("Couldn't parse codeintel output: " + stdout));
                 
-                console.log("[python_completer] " + command + " in " + (Date.now() - start)
+                console.log("[codeintel_worker] " + command + " in " + (Date.now() - start)
                     + "ms (jedi: " + meta.serverTime + "ms): "
                     + doc.getLine(pos.row).substr(0, pos.column));
 
@@ -148,7 +148,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
 }
 
 /**
- * Make sure we're running a jedi daemon (../server/jedi_server.py).
+ * Make sure we're running our codeintel server.
  * It listens on a port in the workspace container or host.
  */
 function ensureDaemon(callback) {
@@ -166,10 +166,9 @@ function ensureDaemon(callback) {
         "bash",
         {
             args: [
-                "-c", launchCommand, "--", pythonVersion,
+                "-c", launchCommand,
                 "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
             ],
-            env: { PYTHONPATH: pythonPath },
         },
         function(err, child) {
             var output = "";
@@ -190,17 +189,19 @@ function ensureDaemon(callback) {
                 output += data;
                 if (/!!Daemon listening/.test(data))
                     done();
-                if (/!!Updating indexes for (.*)/.test(data)) {
+                else if (/!!Updating indexes for (.*)/.test(data)) {
                     clearTimeout(lastInfoTimer);
                     lastInfoTimer = setTimeout(function() {
                         lastInfoPopup = workerUtil.showInfo("Updating indexes for " + RegExp.$1, -1);
                     }, 3000);
                 }
-                if (/!!Updated indexes/.test(data)) {
+                else if (/!!Updated indexes/.test(data)) {
                     clearTimeout(lastInfoTimer);
                     lastInfoPopup && lastInfoPopup.hide();
                 }
-                    
+                else if (/^!!/.test(data)) {
+                    workerUtil.showError(data);
+                }
             });
             child.on("exit", function(code) {
                 if (code === ERROR_PORT_IN_USE) // someone else running daemon?

@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Helper script to launch jedi/pylint in a python2/3 virtualenv
+# Helper script to launch python with codeintel in a python2 virtualenv
 set -e
 
-PYTHON=$1
-COMMAND=$2
+COMMAND=$1
 
 SHAREDENV="/mnt/shared/lib/$PYTHON"
 FALLBACKENV="$HOME/.c9/$PYTHON"
@@ -15,11 +14,7 @@ if [[ -d $SHAREDENV ]]; then
 elif which virtualenv &>/dev/null; then
     ENV=$FALLBACKENV
     if ! [[ -d $ENV ]]; then
-        VERSION=
-        if [ "$PYTHON" = "python3" ]; then
-            VERSION=--python=python3
-        fi
-        virtualenv $VERSION $ENV
+        virtualenv $ENV
     fi
 
     source $ENV/bin/activate
@@ -31,8 +26,7 @@ elif which virtualenv &>/dev/null; then
 
     PYTHON=$ENV/bin/$PYTHON
 else
-    echo "Python support fatal error: virtualenv not installed"
-    echo "try 'pip install virtualenv' or 'sudo pip install virtualenv'"
+    echo "!!Code completion fatal error: virtualenv not installed, try 'pip install virtualenv' or 'sudo pip install virtualenv'" >&2
     exit 1
 fi
 
