@@ -83,15 +83,7 @@ handler.complete = function(doc, fullAst, pos, options, callback) {
             r.guessTooltip = true;
             r.replaceText = r.replaceText || r.name;
             r.priority = r.name[0] === "_" || r.replaceText === r.replaceText.toUpperCase() ? 3 : 4;
-            r.icon = r.icon || "property";
             r.icon = r.name[0] === "_" ? r.icon.replace(/2?$/, "2") : r.icon;
-            r.noDoc = options.noDoc;
-            if (!r.doc)
-                return;
-            var docLines = r.doc.split(/\r\n|\n|\r/);
-            var docBody = docLines.slice(2).join("\n");
-            r.docHeadHtml = workerUtil.filterDocumentation(docLines[0]).replace(/^([A-Za-z0-9$_]+\()self, /, "$1");
-            r.doc = workerUtil.filterDocumentation(docBody.replace(/``/g, "'"));
         });
         callback(null, results);
     });
@@ -122,8 +114,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                     "-s", "--data-binary", "@-", // get input from stdin
                     "localhost:" + DAEMON_PORT + "?mode=" + command
                     + "&row=" + (pos.row + 1) + "&column=" + pos.column
-                    + "&path=" + path.replace(/^\//, "")
-                    + (options.noDoc ? "&nodoc=1" : ""),
+                    + "&path=" + path.replace(/^\//, ""),
                 ],
             },
             function onResult(err, stdout, stderr, meta) {
