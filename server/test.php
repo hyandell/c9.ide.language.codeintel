@@ -19,10 +19,10 @@ function getFooX() {
   // return $foo->;
 }
 
-// Should return constant c and members functions. Position is line 23 col 6.
+// Should return constant c and members functions. Position is row 22 col 6.
 Foo::
 
-/* End of line is line 34, column 7
+/* End of line is row 33, column 7
  *
  * Should complete with built-in candidates:
  * - class_alias
@@ -34,7 +34,7 @@ Foo::
 class_
 
 
-/* End of line is line 46, column 5 
+/* End of line is row 45, column 5 
  *
  * Should complete with built-in candidates:
  * - DateInterval

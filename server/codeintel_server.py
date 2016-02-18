@@ -29,27 +29,54 @@ def main(args):
 
 def process(source, args):
     mode = args.get("mode")
-    buffer, offset = get_buffer_and_offset(source, args)
+    buffer, line, offset = process_input(source, args)
     if mode == "completions":
-        return json.dumps(get_completions(buffer, offset))
+        return json.dumps(get_completions(buffer, line, offset))
     
     if mode == "goto_definitions":
         raise "Not implemented"
 
-def get_completions(buffer, offset):
+def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
     if trigger is None:
         return []
     results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
-    return [{
-        "name": result[1],
-        "icon": {
+    return [
+        remove_nulls({
+            "name": get_proposal_name(kind, name, buffer.lang, line),
+            "replaceText": get_proposal_replace_text(kind, name, buffer.lang, line),
+            "icon": {
                 "function": "method",
                 "module": "package",
-            }.get(result[0], "property")
-    } for result in results]
+                "class": "package",
+            }.get(name, "property")
+        }) for kind, name in results
+    ]
 
-def get_buffer_and_offset(source, args):
+def get_proposal_name(kind, name, lang, line):
+    if lang == "PHP" and kind == "variable":
+        return "$" + name
+    if kind == "function" or kind == "method":
+        return name + "()"
+    return name
+
+def get_proposal_replace_text(kind, name, lang, line):
+    if lang == "PHP" and kind == "variable":
+        return "$" + name
+    if "import " in line:
+        return name
+    if kind == "function" or kind == "method":
+        return name + "(^^)"
+
+def remove_nulls(d):
+    for key, value in d.items():
+        if value is None:
+            del d[key]
+        elif isinstance(value, dict):
+            remove_nulls(value)
+    return d
+
+def process_input(source, args):
     row = int(args.get("row"))
     column = int(args.get("column"))
     path = args.get("path")
@@ -60,8 +87,11 @@ def get_buffer_and_offset(source, args):
     env.get_proj_base_dir = lambda: basedir
     buffer = manager.buf_from_content(source, language, path = path, env = env)
     lines = source.split('\n')
-    offset = sum([len(l) + 1 for l in lines[:row - 1]]) + column - 1
-    return buffer, offset
+    line = lines[row]
+    offset = sum([len(l) + 1 for l in lines[:row]]) + column
+    print offset
+    print source[offset-1]
+    return buffer, line, offset
 
 class LoggingEvalController(EvalController):
     def debug(self, msg, *args): logger.debug(msg, *args)

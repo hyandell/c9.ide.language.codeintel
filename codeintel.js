@@ -22,23 +22,21 @@ define(function(require, exports, module) {
             .replace(/ {2,}/g, " ");
         
         plugin.on("load", function() {
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_completer", function(err, handler) {
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoad, plugin);
+            
+            function onLoad(err, handler) {
                 if (err) return console.error(err);
-                setupHandler(handler);
-            }, plugin);
+                handler.emit("setup", {
+                    server: server,
+                    launchCommand: launchCommand,
+                    hosted: !options.testing && c9.hosted
+                });
+            }
         });
         
         plugin.on("unload", function() {
             
         });
-            
-        function setupHandler(handler) {
-            handler.emit("setup", {
-                server: server,
-                launchCommand: launchCommand,
-                hosted: !options.testing && c9.hosted
-            });
-        }
         
         /** @ignore */
         register(null, {

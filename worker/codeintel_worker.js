@@ -9,14 +9,39 @@ define(function(require, exports, module) {
 var baseHandler = require("plugins/c9.ide.language/base_handler");
 var workerUtil = require("plugins/c9.ide.language/worker_util");
 
-var KEYWORD_REGEX = new RegExp(
-    "^(and|as|assert|break|class|continue|def|del|elif|else|except|exec|"
-    + "finally|for|from|global|if|import|in|is|lambda|not|or|pass|print|"
-    + "raise|return|try|while|with|yield)$"
-);
-var DAEMON_PORT = 10880;
-var ERROR_PORT_IN_USE = 98;
-var ERROR_NO_SERVER = 7;
+var DAEMON_PORT = 10881;
+var LANGUAGES = {
+    c_cpp: "C++",
+    css: "CSS",
+    django: "Django",
+    perl: "Perl",
+    php: "PHP",
+    ruby: "Ruby",
+    tcl: "Tcl",
+    
+    // HTML-based & template languages
+    html4: "HTML",
+    html: "HTML5",
+    rhtml: "RHTML",
+    templatetoolkit: "TemplateToolkit",
+    smarty: "Smarty",
+    twig: "Twig",
+    xslt: "XSLT",
+    xul: "XUL",
+    
+    // Other unused languages
+    python: "Python",
+    python3: "Python3",
+    golang: "Go",
+    javascript: "JavaScript",
+    less: "Less",
+    mason: "Mason",
+    mustache: "Mustache",
+    mxml: "MXML",
+    nodejs: "Node.js",
+    xbl: "XBL",
+    xml: "XML",
+};
 
 var handler = module.exports = Object.create(baseHandler);
 var pythonVersion = "python2";
