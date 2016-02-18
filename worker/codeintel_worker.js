@@ -112,7 +112,8 @@ function callDaemon(command, path, doc, pos, options, callback) {
                 args: [
                     "-s", "--data-binary", "@-", // get input from stdin
                     "localhost:" + DAEMON_PORT + "?mode=" + command
-                    + "&row=" + (pos.row + 1) + "&column=" + pos.column
+                    + "&row=" + pos.row + "&column=" + pos.column
+                    + "&language=" + LANGUAGES[options.language]
                     + "&path=" + encodeURIComponent(path.replace(/^\//, ""))
                     + (options.noDoc ? "&nodoc=1" : ""),
                 ],
@@ -159,7 +160,7 @@ function ensureDaemon(callback) {
         {
             args: [
                 "-c", launchCommand,
-                "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
+                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
             ],
         },
         function(err, child) {
