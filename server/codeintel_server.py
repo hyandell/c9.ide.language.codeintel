@@ -87,7 +87,7 @@ def process_input(source, args):
     
     env = manager.env = DefaultEnvironment()
     env.get_proj_base_dir = lambda: basedir
-    buffer = manager.buf_from_content(source, language, path = path, env = env)
+    buffer = manager.buf_from_content(source + "\n", language, path = path, env = env)
     lines = source.split('\n')
     line = lines[row]
     offset = sum([len(l) + 1 for l in lines[:row]]) + column
