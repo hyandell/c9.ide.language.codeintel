@@ -45,8 +45,8 @@ def get_completions(buffer, line, offset):
     results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
     return [
         remove_nulls({
-            "name": get_proposal_name(kind, name, buffer.lang, line),
-            "replaceText": get_proposal_replace_text(kind, name, buffer.lang, line),
+            "name": get_proposal_name(kind, name, buffer.lang, trigger),
+            "replaceText": get_proposal_replace_text(kind, name, buffer.lang, trigger, line),
             "icon": {
                 "function": "method",
                 "module": "package",
@@ -55,15 +55,15 @@ def get_completions(buffer, line, offset):
         }) for kind, name in results
     ]
 
-def get_proposal_name(kind, name, lang, line):
-    if lang == "PHP" and kind == "variable":
+def get_proposal_name(kind, name, lang, trigger):
+    if lang == "PHP" and kind == "variable" and trigger.name != "php-complete-object-members":
         return "$" + name
     if kind == "function" or kind == "method":
         return name + "()"
     return name
 
-def get_proposal_replace_text(kind, name, lang, line):
-    if lang == "PHP" and kind == "variable":
+def get_proposal_replace_text(kind, name, lang, trigger, line):
+    if lang == "PHP" and kind == "variable" and trigger.name != "php-complete-object-members":
         return "$" + name
     if "import " in line:
         return name
