@@ -35,8 +35,8 @@ def process(source, args):
     if mode == "completions":
         return json.dumps(get_completions(buffer, line, offset))
     
-    if mode == "goto_definitions":
-        raise "Not implemented"
+    if mode == "definitions":
+        return json.dumps(get_definitions(buffer, line, offset))
 
 def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
@@ -54,6 +54,18 @@ def get_completions(buffer, line, offset):
             }.get(name, "property")
         }) for kind, name in results
     ]
+
+def get_definitions(buffer, line, offset):
+    trigger = buffer.defn_trg_from_pos(offset)
+    if trigger is None:
+        return []
+    results = buffer.defns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    if results is None or len(results) < 1:
+        return []
+    return {
+        "path": "/" + results[0].path,
+        "row": results[0].line - 1,
+    }
 
 def get_proposal_name(kind, name, lang, trigger):
     if lang == "PHP" and kind == "variable" and trigger.name != "php-complete-object-members":
@@ -143,7 +155,7 @@ scanned_langs = []
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run codeintel commands as a daemon or via stdin")
-    parser.add_argument("mode", help="Mode of operation", choices=["daemon", "completions", "goto_definitions", "goto_assignments"])
+    parser.add_argument("mode", help="Mode of operation", choices=["daemon", "completions", "definitions", "calltips"])
     parser.add_argument("--row", type=int, help="The row to read from")
     parser.add_argument("--column", type=int, help="The column to read from")
     parser.add_argument("--path", help="The path of the file")

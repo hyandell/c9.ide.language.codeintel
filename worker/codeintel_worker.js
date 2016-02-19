@@ -99,7 +99,7 @@ handler.complete = function(doc, fullAst, pos, options, callback) {
  * Jump to the definition of what's under the cursor.
  */
 handler.jumpToDefinition = function(doc, fullAst, pos, options, callback) {
-    callDaemon("goto_definitions", handler.path, doc, pos, options, callback);
+    callDaemon("definitions", handler.path, doc, pos, options, callback);
 };
 
 /**
