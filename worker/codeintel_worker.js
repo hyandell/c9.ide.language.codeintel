@@ -56,6 +56,8 @@ handler.handlesLanguage = function(language) {
     return language === "php";
 };
 
+handler.$disableZeroLengthCompletion = true;
+
 handler.init = function(callback) {
     var emitter = handler.getEmitter();
     emitter.on("setup", function(e) {
@@ -74,6 +76,9 @@ handler.onDocumentOpen = function(path, doc, oldPath, callback) {
  * Complete code at the current cursor position.
  */
 handler.complete = function(doc, fullAst, pos, options, callback) {
+    if (!options.identifierPrefix)
+        return callback(new Error("Warning: codeintel doesn't support empty-prefix completions"));
+    
     callDaemon("completions", handler.path, doc, pos, options, function(err, results, meta) {
         if (err) return callback(err);
         
