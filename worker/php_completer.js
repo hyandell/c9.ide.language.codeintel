@@ -39,25 +39,4 @@ handler.getCacheCompletionRegex = function() {
     );
 };
 
-handler.predictNextCompletion = function(doc, fullAst, pos, options, callback) {
-    /*
-    if (!options.matches.length) {
-        // Normally we wouldn't complete here, maybe we can complete for the next char?
-        // Let's do so unless it looks like the next char may be a newline or equals sign
-        if (options.line[pos.column - 1] && /(?![{;})\]\s"'\+\-\*])./.test(options.line[pos.column - 1]))
-            return callback(null, { predicted: "" });
-    }
-    */
-    var predicted = options.matches.filter(function(m) {
-        return m.isContextual;
-    });
-    if (predicted.length !== 1 || predicted[0].icon === "method")
-        return callback();
-    console.log("[php_completer] Predicted our next completion will be for " + predicted[0].replaceText + ".");
-    callback(null, {
-        predicted: predicted[0].replaceText + ".",
-        showEarly: predicted[0].class === "package"
-    });
-};
-
 });
