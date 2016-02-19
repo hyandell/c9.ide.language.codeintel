@@ -21,6 +21,26 @@ define(function(require, exports, module) {
         var launchCommand = require("text!./server/launch_command.sh")
             .replace(/ {2,}/g, " ");
         
+        var CATALOGS = [
+            {"lang": "PHP", "name": "PECL", "description": "A collection of PHP Extensions"},
+            {"lang": "PHP", "name": "Drupal", "description": "A full-featured PHP content management/discussion engine"},
+            {"lang": "Ruby", "name": "Rails", "description": "Rails"},
+            /*
+            {"lang": "Python", "name": "PyWin32", "description": "Python Extensions for Windows"},
+            {"lang": "Python3", "name": "PyWin32 (Python3)", "description": "Python Extensions for Windows"},
+            {"lang": "JavaScript", "name": "dojo", "description": "Dojo Toolkit API"},
+            {"lang": "JavaScript", "name": "Ext_30", "description": "Ext JavaScript framework"},
+            {"lang": "JavaScript", "name": "HTML5", "description": "HTML5 (Canvas, Web Messaging, Microdata)"},
+            {"lang": "JavaScript", "name": "jQuery", "description": "jQuery JavaScript library"},
+            {"lang": "JavaScript", "name": "MochiKit", "description": "A lightweight JavaScript library"},
+            {"lang": "JavaScript", "name": "Mozilla Toolkit", "description": "Mozilla Toolkit API"},
+            {"lang": "JavaScript", "name": "Prototype", "description": "JavaScript framework for web development"},
+            {"lang": "JavaScript", "name": "XBL", "description": "XBL JavaScript support"},
+            {"lang": "JavaScript", "name": "XPCOM", "description": "Mozilla XPCOM Components"},
+            {"lang": "JavaScript", "name": "YUI", "description": "Yahoo! User Interface Library1"}
+            */
+        ];
+        
         plugin.on("load", function() {
             language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoad, plugin);
             language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoad, plugin);
