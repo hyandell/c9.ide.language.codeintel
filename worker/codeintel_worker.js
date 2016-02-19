@@ -58,6 +58,8 @@ handler.handlesLanguage = function(language) {
 
 handler.$disableZeroLengthCompletion = true;
 
+handler.$recacheCompletionLength = 3;
+
 handler.init = function(callback) {
     var emitter = handler.getEmitter();
     emitter.on("setup", function(e) {
