@@ -78,7 +78,7 @@ handler.onDocumentOpen = function(path, doc, oldPath, callback) {
  * Complete code at the current cursor position.
  */
 handler.complete = function(doc, fullAst, pos, options, callback) {
-    if (!options.identifierPrefix)
+    if (!options.identifierPrefix && (!options.line[pos.column - 1] || " " === options.line[pos.column - 1]))
         return callback(new Error("Warning: codeintel doesn't support empty-prefix completions"));
     
     callDaemon("completions", handler.path, doc, pos, options, function(err, results, meta) {
