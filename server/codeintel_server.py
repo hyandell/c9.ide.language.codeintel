@@ -28,15 +28,18 @@ def main(args):
     server.serve_forever()
 
 def process(source, args):
-    mode = args.get("mode")
+    mode = args["mode"]
     buffer, line, offset = process_input(source, args)
     scan_workspace(buffer)
     
     if mode == "completions":
         return json.dumps(get_completions(buffer, line, offset))
-    
     if mode == "definitions":
         return json.dumps(get_definitions(buffer, line, offset))
+    if mode == "calltips":
+        return json.dumps(get_calltips(buffer, line, offset))
+    if mode == "catalogs":
+        return json.dumps(get_catalogs(buffer, line, offset))
 
 def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
@@ -51,7 +54,7 @@ def get_completions(buffer, line, offset):
                 "function": "method",
                 "module": "package",
                 "class": "package",
-            }.get(name, "property")
+            }.get(name,"property")
         }) for kind, name in results
     ]
 
@@ -66,6 +69,18 @@ def get_definitions(buffer, line, offset):
         "path": "/" + results[0].path,
         "row": results[0].line - 1,
     }
+
+def get_calltips(buffer, line, offset):
+    trigger = buffer.preceding_trg_from_pos(offset, offset)
+    if trigger is None:
+        return []
+    result = buffer.calltips_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    if result is None:
+        return ""
+    return result
+
+def get_catalogs(buffer, line, offset):
+    return [c for c in manager.db.get_catalogs_zone().avail_catalogs()]
 
 def get_proposal_name(kind, name, lang, trigger):
     if lang == "PHP" and kind == "variable" and trigger.name != "php-complete-object-members":
@@ -91,13 +106,15 @@ def remove_nulls(d):
     return d
 
 def process_input(source, args):
-    row = int(args.get("row"))
-    column = int(args.get("column"))
-    path = args.get("path")
-    basedir = args.get("basedir")
-    language = args.get("language")
+    row = int(args["row"])
+    column = int(args["column"])
+    path = args["path"]
+    basedir = args["basedir"]
+    language = args["language"]
+    catalogs = (args["catalogs"] or "").split(",")
     
     env = manager.env = DefaultEnvironment()
+    env.set_pref("codeintel_selected_catalogs", catalogs)
     env.get_proj_base_dir = lambda: basedir
     buffer = manager.buf_from_content(source + "\n", language, path = path, env = env)
     lines = source.split('\n')
@@ -113,6 +130,7 @@ def scan_workspace(buffer):
         scanned_langs.append(buffer.lang)
         buffer.scan()
         sys.stderr.write("!!Done updating indexes\n")
+        manager.db.save()
     else:
         buffer.scan()
 
@@ -155,7 +173,7 @@ scanned_langs = []
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run codeintel commands as a daemon or via stdin")
-    parser.add_argument("mode", help="Mode of operation", choices=["daemon", "completions", "definitions", "calltips"])
+    parser.add_argument("mode", help="Mode of operation", choices=["daemon", "completions", "definitions", "calltips", "catalogs"])
     parser.add_argument("--row", type=int, help="The row to read from")
     parser.add_argument("--column", type=int, help="The column to read from")
     parser.add_argument("--path", help="The path of the file")
@@ -163,5 +181,6 @@ if __name__ == "__main__":
     parser.add_argument("--language", help="The language of the file")
     parser.add_argument("--port", type=int, help="The port for the daemon to listen on")
     parser.add_argument("--nodoc", help="Don't include docstrings in output")
+    parser.add_argument("--catalogs", help="Catalogs to include (comma-separated)")
     args = parser.parse_args()
     main(args)
