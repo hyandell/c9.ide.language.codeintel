@@ -118,6 +118,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                 json: true,
                 args: [
                     "--unix-socket", DAEMON_SOCKET,
+                    "-H", "Expect:", // don't wait for "100-Continue"
                     "-s", "--data-binary", "@-", // get input from stdin
                     "http:/?mode=" + command
                     + "&row=" + pos.row + "&column=" + pos.column
