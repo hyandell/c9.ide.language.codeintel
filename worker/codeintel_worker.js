@@ -9,7 +9,7 @@ define(function(require, exports, module) {
 var baseHandler = require("plugins/c9.ide.language/base_handler");
 var workerUtil = require("plugins/c9.ide.language/worker_util");
 
-var DAEMON_PORT = 10881;
+var DAEMON_SOCKET = "/tmp/codeintel.socket";
 var ERROR_PORT_IN_USE = 98;
 var ERROR_NO_SERVER = 7;
 var LANGUAGES = {
@@ -117,8 +117,9 @@ function callDaemon(command, path, doc, pos, options, callback) {
                 mode: "stdin",
                 json: true,
                 args: [
+                    "--unix-socket", DAEMON_SOCKET,
                     "-s", "--data-binary", "@-", // get input from stdin
-                    "localhost:" + DAEMON_PORT + "?mode=" + command
+                    "http:/?mode=" + command
                     + "&row=" + pos.row + "&column=" + pos.column
                     + "&language=" + LANGUAGES[options.language]
                     + "&path=" + encodeURIComponent(path.replace(/^\//, ""))
@@ -149,7 +150,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
 
 /**
  * Make sure we're running our codeintel server.
- * It listens on a port in the workspace container or host.
+ * It listens on a socket in the workspace container or host.
  */
 function ensureDaemon(callback) {
     if (daemon)
@@ -167,7 +168,7 @@ function ensureDaemon(callback) {
         {
             args: [
                 "-c", launchCommand,
-                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
+                "--", "$PYTHON -c '" + server + "' daemon --socket " + DAEMON_SOCKET
             ],
         },
         function(err, child) {
