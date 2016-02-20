@@ -44,6 +44,7 @@ define(function(require, exports, module) {
         plugin.on("load", function() {
             language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoad, plugin);
             language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoad, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/ruby_completer", onLoad, plugin);
             
             function onLoad(err, handler) {
                 if (err) return console.error(err);

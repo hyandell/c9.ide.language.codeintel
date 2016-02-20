@@ -7,8 +7,16 @@ from os import path
 import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
-# Hackfix codeintel import path
+# Hackfix codeintel import
 sys.path.extend([p + "/codeintel" for p in sys.path])
+
+# Hackfix inflector compatibility
+import inflector
+class MyInflector: Inflector = inflector.Inflector
+class MyInflector2: Inflector = MyInflector
+sys.modules["inflector.Inflector"] = MyInflector2
+sys.modules["inflector"] = MyInflector2
+import inflector.Inflector
 
 from codeintel2.common import EvalController
 from codeintel2.manager import Manager
@@ -46,6 +54,8 @@ def get_completions(buffer, line, offset):
     if trigger is None:
         return []
     results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    if results is None:
+        return []
     return [
         remove_nulls({
             "name": get_proposal_name(kind, name, buffer.lang, trigger),
@@ -63,7 +73,7 @@ def get_definitions(buffer, line, offset):
     if trigger is None:
         return []
     results = buffer.defns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
-    if results is None or len(results) < 1:
+    if results is None:
         return []
     return {
         "path": "/" + results[0].path,
@@ -106,12 +116,12 @@ def remove_nulls(d):
     return d
 
 def process_input(source, args):
-    row = int(args["row"])
-    column = int(args["column"])
-    path = args["path"]
-    basedir = args["basedir"]
-    language = args["language"]
-    catalogs = (args["catalogs"] or "").split(",")
+    row = int(args.get("row"))
+    column = int(args.get("column"))
+    path = args.get("path")
+    basedir = args.get("basedir")
+    language = args.get("language")
+    catalogs = args.get("catalogs").split(",") if args.get("catalogs") else []
     
     env = manager.env = DefaultEnvironment()
     env.set_pref("codeintel_selected_catalogs", catalogs)

@@ -53,7 +53,7 @@ var lastInfoTimer;
 var lastInfoPopup;
 
 handler.handlesLanguage = function(language) {
-    return language === "php";
+    return language === "php" /* not working yet: || language === "ruby"*/;
 };
 
 handler.$disableZeroLengthCompletion = true;
@@ -200,6 +200,9 @@ function ensureDaemon(callback) {
                 }
                 else if (/^!!/.test(data)) {
                     workerUtil.showError(data);
+                }
+                else {
+                    console.log("[codeintel_worker] " + data);
                 }
             });
             child.on("exit", function(code) {
