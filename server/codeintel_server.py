@@ -3,8 +3,6 @@ import json
 import sys
 import os
 import logging
-import socket
-import SocketServer
 from os import path
 import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -30,12 +28,11 @@ def main(args):
         manager.finalize()
         return
     try:
-        os.unlink(args.socket)
-        server = UnixHTTPServer(args.socket, Daemon)
+        server = HTTPServer(("localhost", int(args.port)), Daemon)
     except:
-        sys.stderr.write("!!Daemon unable to listen at %s\n" % args.socket)
+        sys.stderr.write("!!Daemon unable to listen at :%s\n" % args.port)
         sys.exit(98)
-    sys.stderr.write("!!Daemon " + "listening at %s\n" % args.socket)
+    sys.stderr.write("!!Daemon " + "listening at :%s\n" % args.port)
     server.serve_forever()
 
 def process(source, args):
@@ -153,13 +150,6 @@ class LoggingEvalController(EvalController):
     def warn(self, msg, *args): logger.warn(msg, *args)
     def error(self, msg, *args): logger.error(msg, *args)
 
-class UnixHTTPServer(HTTPServer):
-    address_family = socket.AF_UNIX
-    def server_bind(self):
-        SocketServer.TCPServer.server_bind(self)
-        self.server_name = "foo"
-        self.server_port = 0
-
 class Daemon(BaseHTTPRequestHandler):
     def do_POST(self):
         query = urlparse.urlparse(self.path).query
@@ -199,7 +189,7 @@ if __name__ == "__main__":
     parser.add_argument("--path", help="The path of the file")
     parser.add_argument("--basedir", help="The basedir of the file")
     parser.add_argument("--language", help="The language of the file")
-    parser.add_argument("--socket", help="The file socket for the daemon to listen on")
+    parser.add_argument("--port", type=int, help="The port for the daemon to listen on")
     parser.add_argument("--nodoc", help="Don't include docstrings in output")
     parser.add_argument("--catalogs", help="Catalogs to include (comma-separated)")
     args = parser.parse_args()
