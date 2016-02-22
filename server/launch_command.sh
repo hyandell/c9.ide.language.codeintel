@@ -4,14 +4,19 @@ set -e
 
 COMMAND=$1
 
-SHAREDENV="/mnt/shared/lib/python"
-FALLBACKENV="$HOME/.c9/python"
+SHAREDENV="/mnt/shared/lib/python2"
+FALLBACKENV="$HOME/.c9/python2"
 
 if [[ -d $SHAREDENV ]]; then
     ENV=$SHAREDENV
     source $ENV/bin/activate
     PYTHON="$ENV/bin/python"
 elif which virtualenv &>/dev/null; then
+    if [ ! -e /usr/include/python2.7/Python.h ]; then
+        echo "!!Code completion fatal error: python-dev not installed (try sudo apt-get install python-dev)"
+        exit 1
+    fi
+
     ENV=$FALLBACKENV
     if ! [[ -d $ENV ]]; then
         virtualenv $ENV
@@ -23,6 +28,14 @@ elif which virtualenv &>/dev/null; then
         echo "!!Installing dependencies" >&2
         pip install --upgrade codeintel >&2
         echo "!!Done installing dependencies" >&2
+        
+        mkdir /tmp/codeintel
+        cd /tmp/codeintel
+        pip install --download /tmp/codeintel codeintel==0.9.3
+        tar xf CodeIntel-0.9.3.tar.gz
+        mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
+        tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
+        pip install -U --no-index --find-links=/tmp/codeintel codeintel
     fi
 
     PYTHON=$ENV/bin/python
