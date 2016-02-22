@@ -64,7 +64,10 @@ def get_completions(buffer, line, offset):
                 "function": "method",
                 "module": "package",
                 "class": "package",
-            }.get(name,"property")
+                "element": "event",
+                "property": "property",
+                "value": "method",
+            }.get(kind, "property"),
         }) for kind, name in results
     ]
 
