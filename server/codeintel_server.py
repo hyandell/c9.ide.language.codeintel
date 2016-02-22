@@ -30,7 +30,7 @@ def main(args):
     try:
         server = HTTPServer(("localhost", int(args.port)), Daemon)
     except:
-        sys.stderr.write("!!Daemon unable to listen at :%s\n" % args.port)
+        sys.stderr.write("Daemon unable to listen at :%s\n" % args.port)
         sys.exit(98)
     sys.stderr.write("!!Daemon " + "listening at :%s\n" % args.port)
     server.serve_forever()

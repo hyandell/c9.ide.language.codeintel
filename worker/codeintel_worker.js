@@ -53,12 +53,10 @@ var lastInfoTimer;
 var lastInfoPopup;
 
 handler.handlesLanguage = function(language) {
-    return language === "php" /* not working yet: || language === "ruby"*/;
+    return language === "php" || language === "less" /* not working yet: || language === "ruby"*/;
 };
 
 handler.$disableZeroLengthCompletion = true;
-
-handler.$recacheCompletionLength = 3;
 
 handler.init = function(callback) {
     var emitter = handler.getEmitter();
@@ -78,7 +76,7 @@ handler.onDocumentOpen = function(path, doc, oldPath, callback) {
  * Complete code at the current cursor position.
  */
 handler.complete = function(doc, fullAst, pos, options, callback) {
-    if (!options.identifierPrefix && (!options.line[pos.column - 1] || " " === options.line[pos.column - 1]))
+    if (options.language === "PHP" && !options.identifierPrefix && (!options.line[pos.column - 1] || " " === options.line[pos.column - 1]))
         return callback(new Error("Warning: codeintel doesn't support empty-prefix completions"));
     
     callDaemon("completions", handler.path, doc, pos, options, function(err, results, meta) {
@@ -87,6 +85,7 @@ handler.complete = function(doc, fullAst, pos, options, callback) {
         results && results.forEach(function beautifyCompletion(r) {
             r.isContextual = true;
             r.guessTooltip = true;
+            r.nodoc = "always";
             r.replaceText = r.replaceText || r.name;
             r.priority = r.name[0] === "_" || r.replaceText === r.replaceText.toUpperCase() ? 3 : 4;
             r.icon = r.name[0] === "_" ? r.icon.replace(/2?$/, "2") : r.icon;

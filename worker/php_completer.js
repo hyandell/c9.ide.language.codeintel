@@ -14,6 +14,8 @@ handler.handlesLanguage = function(language) {
     return language === "php";
 };
 
+handler.$recacheCompletionLength = 3;
+
 handler.getIdentifierRegex = function() {
     // Note: $$ indicates dollars are allowed at the start of variables
     return (/[$$a-zA-Z0-9_\x7f-\xff]/);
@@ -37,6 +39,14 @@ handler.getCacheCompletionRegex = function() {
         // spaces
         + "|\\s)+"
     );
+};
+
+handler.predictNextCompletion = function(doc, ast, pos, options, callback) {
+    if (/\$[a-zA-Z0-9_\x7f-\xff]+-/.test(options.line.substr(0, pos.colomn)))
+        return callback({ predicted: ">" });
+    if (/\$[a-zA-Z0-9_\x7f-\xff]+:/.test(options.line.substr(0, pos.colomn)))
+        return callback({ predicted: ":" });
+    callback();
 };
 
 });
