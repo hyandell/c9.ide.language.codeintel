@@ -46,6 +46,7 @@ var LANGUAGES = {
 };
 
 var handler = module.exports = Object.create(baseHandler);
+var languages = [];
 var server;
 var launchCommand;
 var daemon;
@@ -53,7 +54,11 @@ var lastInfoTimer;
 var lastInfoPopup;
 
 handler.handlesLanguage = function(language) {
-    return language === "php" || language === "less" /* not working yet: || language === "ruby"*/;
+    return languages.indexOf(language) > -1;
+};
+
+handler.addLanguage = function(language) {
+    languages.push(language);
 };
 
 handler.$disableZeroLengthCompletion = true;

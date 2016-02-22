@@ -7,8 +7,10 @@
 define(function(require, exports, module) {
 
 var baseHandler = require("plugins/c9.ide.language/base_handler");
+var codeintel = require("plugins/c9.ide.language.codeintel/worker/codeintel_worker");
 
 var handler = module.exports = Object.create(baseHandler);
+codeintel.addLanguage("ruby");
 
 handler.handlesLanguage = function(language) {
     return language === "ruby";

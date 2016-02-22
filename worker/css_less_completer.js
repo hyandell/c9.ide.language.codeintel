@@ -7,9 +7,11 @@
 define(function(require, exports, module) {
 
 var baseHandler = require("plugins/c9.ide.language/base_handler");
-var codeintel = require("./codeintel_worker.js");
+var codeintel = require("plugins/c9.ide.language.codeintel/worker/codeintel_worker");
 
 var handler = module.exports = Object.create(baseHandler);
+codeintel.addLanguage("css");
+codeintel.addLanguage("less");
 
 handler.handlesLanguage = function(language) {
     return language === "css" || language === "less";
