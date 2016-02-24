@@ -26,9 +26,6 @@ elif which virtualenv &>/dev/null; then
 
     if ! python -c 'import codeintel' &>/dev/null; then
         echo "!!Installing dependencies" >&2
-        pip install --upgrade codeintel >&2
-        echo "!!Done installing dependencies" >&2
-        
         mkdir /tmp/codeintel
         cd /tmp/codeintel
         pip install --download /tmp/codeintel codeintel==0.9.3
@@ -36,6 +33,7 @@ elif which virtualenv &>/dev/null; then
         mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
         tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
         pip install -U --no-index --find-links=/tmp/codeintel codeintel
+        echo "!!Done installing dependencies" >&2
     fi
 
     PYTHON=$ENV/bin/python
