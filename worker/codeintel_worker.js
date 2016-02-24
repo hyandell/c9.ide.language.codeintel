@@ -193,10 +193,11 @@ function ensureDaemon(callback) {
                 output += data;
                 if (/!!Daemon listening/.test(data))
                     done();
-                else if (/!!(Updating|Installing)/.test(data)) {
+                else if (/!!(Updating .*|Installing .*)/.test(data)) {
+                    var message = RegExp.$1;
                     clearTimeout(lastInfoTimer);
                     lastInfoTimer = setTimeout(function() {
-                        lastInfoPopup = workerUtil.showInfo(RegExp.$1, -1);
+                        lastInfoPopup = workerUtil.showInfo(message, -1);
                     }, 3000);
                 }
                 else if (/!!Done/.test(data)) {
