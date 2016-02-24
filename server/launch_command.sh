@@ -7,7 +7,7 @@ COMMAND=$1
 SHAREDENV="/mnt/shared/lib/python2"
 FALLBACKENV="$HOME/.c9/python2"
 
-if [[ -d $SHAREDENV ]]; then
+if [[ -d $SHAREDENV/lib/python2.7/site-packages/codeintel ]]; then
     ENV=$SHAREDENV
     source $ENV/bin/activate
     PYTHON="$ENV/bin/python"
