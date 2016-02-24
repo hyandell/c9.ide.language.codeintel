@@ -25,10 +25,12 @@ elif which virtualenv &>/dev/null; then
     source $ENV/bin/activate
 
     if ! python -c 'import codeintel' &>/dev/null; then
-        echo "!!Installing dependencies" >&2
+        echo "!!Installing code completion dependencies" >&2
+        set -x
+        rm -rf /tmp/codeintel $ENV/build
         mkdir /tmp/codeintel
         cd /tmp/codeintel
-        pip install --download /tmp/codeintel codeintel==0.9.3
+        pip install --download /tmp/codeintel codeintel==0.9.3 2>&1
         tar xf CodeIntel-0.9.3.tar.gz
         mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
         tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
