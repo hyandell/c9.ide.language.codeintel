@@ -28,14 +28,18 @@ elif which virtualenv &>/dev/null; then
     if ! python -c 'import codeintel' &>/dev/null; then
         echo "!!Installing code completion daemon for $LANGUAGE. This may take a few minutes." >&2
         set -x
-        rm -rf /tmp/codeintel $ENV/build
-        mkdir /tmp/codeintel
-        cd /tmp/codeintel
-        pip install --download /tmp/codeintel codeintel==0.9.3 2>&1
-        tar xf CodeIntel-0.9.3.tar.gz
-        mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
-        tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
-        pip install -U --no-index --find-links=/tmp/codeintel codeintel
+        if [ "$(uname)" == Darwin ]; then
+            pip install codeintel==0.9.3
+        else
+            rm -rf /tmp/codeintel $ENV/build
+            mkdir /tmp/codeintel
+            cd /tmp/codeintel
+            pip install --download /tmp/codeintel codeintel==0.9.3 2>&1
+            tar xf CodeIntel-0.9.3.tar.gz
+            mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
+            tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
+            pip install -U --no-index --find-links=/tmp/codeintel codeintel
+        fi
         echo "!!Done installing code completion daemon for $LANGUAGE!" >&2
     fi
 
