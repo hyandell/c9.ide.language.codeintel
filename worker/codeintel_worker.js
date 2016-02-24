@@ -191,8 +191,9 @@ function ensureDaemon(language, callback) {
             
             child.stderr.on("data", function(data) {
                 output += data;
-                if (/!!Daemon listening/.test(data))
+                if (/!!Daemon listening/.test(data)) {
                     done();
+                }
                 else if (/!!(Updating .*|Installing .*)/.test(data)) {
                     var message = RegExp.$1;
                     clearTimeout(lastInfoTimer);
@@ -232,6 +233,7 @@ function ensureDaemon(language, callback) {
     function done(err, dontRetry) {
         callback && callback(err, dontRetry);
         callback = null;
+        handler.sender.emit("codeintel_ready", { err: err && err.stack });
     }
 }
 
