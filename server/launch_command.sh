@@ -3,6 +3,7 @@
 set -e
 
 COMMAND=$1
+LANGUAGE=$2
 
 SHAREDENV="/mnt/shared/lib/python2"
 FALLBACKENV="$HOME/.c9/python2"
@@ -25,7 +26,7 @@ elif which virtualenv &>/dev/null; then
     source $ENV/bin/activate
 
     if ! python -c 'import codeintel' &>/dev/null; then
-        echo "!!Installing code completion dependencies" >&2
+        echo "!!Installing code completion daemon for $LANGUAGE..." >&2
         set -x
         rm -rf /tmp/codeintel $ENV/build
         mkdir /tmp/codeintel

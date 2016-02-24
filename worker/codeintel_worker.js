@@ -74,7 +74,7 @@ handler.init = function(callback) {
 
 handler.onDocumentOpen = function(path, doc, oldPath, callback) {
     if (!launchCommand) return callback();
-    ensureDaemon(callback);
+    ensureDaemon(handler.language, callback);
 };
 
 /**
@@ -111,7 +111,7 @@ handler.jumpToDefinition = function(doc, fullAst, pos, options, callback) {
  * so we use curl to send a request.
  */
 function callDaemon(command, path, doc, pos, options, callback) {
-    ensureDaemon(function(err, dontRetry) {
+    ensureDaemon(handler.language, function(err, dontRetry) {
         if (err) return callback(err);
         
         var start = Date.now();
@@ -155,7 +155,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
  * Make sure we're running our codeintel server.
  * It listens on a port in the workspace container or host.
  */
-function ensureDaemon(callback) {
+function ensureDaemon(language, callback) {
     if (daemon)
         return done(daemon.err, true);
 
@@ -171,7 +171,7 @@ function ensureDaemon(callback) {
         {
             args: [
                 "-c", launchCommand,
-                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
+                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT, language
             ],
         },
         function(err, child) {
