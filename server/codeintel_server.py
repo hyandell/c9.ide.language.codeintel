@@ -53,7 +53,7 @@ def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
     if trigger is None:
         return []
-    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 10)
     if results is None:
         return []
     return [
@@ -75,7 +75,7 @@ def get_definitions(buffer, line, offset):
     trigger = buffer.defn_trg_from_pos(offset)
     if trigger is None:
         return []
-    results = buffer.defns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    results = buffer.defns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 10)
     if results is None:
         return []
     return {
@@ -87,7 +87,7 @@ def get_calltips(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
     if trigger is None:
         return []
-    result = buffer.calltips_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 5)
+    result = buffer.calltips_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 10)
     if result is None:
         return ""
     return result
