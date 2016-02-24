@@ -26,7 +26,7 @@ elif which virtualenv &>/dev/null; then
     source $ENV/bin/activate
 
     if ! python -c 'import codeintel' &>/dev/null; then
-        echo "!!Installing code completion daemon for $LANGUAGE..." >&2
+        echo "!!Installing code completion daemon for $LANGUAGE. This may take a few minutes." >&2
         set -x
         rm -rf /tmp/codeintel $ENV/build
         mkdir /tmp/codeintel
@@ -36,7 +36,7 @@ elif which virtualenv &>/dev/null; then
         mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
         tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
         pip install -U --no-index --find-links=/tmp/codeintel codeintel
-        echo "!!Done installing dependencies" >&2
+        echo "!!Done installing code completion daemon for $LANGUAGE!" >&2
     fi
 
     PYTHON=$ENV/bin/python

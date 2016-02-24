@@ -197,11 +197,13 @@ function ensureDaemon(language, callback) {
                     var message = RegExp.$1;
                     clearTimeout(lastInfoTimer);
                     lastInfoTimer = setTimeout(function() {
-                        lastInfoPopup = workerUtil.showInfo(message, -1);
+                        lastInfoPopup = workerUtil.showInfo(message, 5000);
                     }, 3000);
                 }
-                else if (/!!Done/.test(data)) {
-                    clearInfoPopup();
+                else if (/!!Done(.*)/.test(data)) {
+                    if (lastInfoPopup)
+                        workerUtil.showInfo(RegExp.$1, 3000);
+                    lastInfoPopup = null;
                 }
                 else if (/^!!/.test(data)) {
                     workerUtil.showError(data);
