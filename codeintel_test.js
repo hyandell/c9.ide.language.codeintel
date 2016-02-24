@@ -51,7 +51,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
                     
                     tabs.focusTab(tab);
                     
-                    imports.worker.on("codeintel_ready", function(e) {
+                    imports.worker.once("codeintel_ready", function(e) {
                         assert(!e.data.err, e.data.err);
                         done();
                     });
