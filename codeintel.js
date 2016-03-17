@@ -6,7 +6,7 @@
 define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "language", "jsonalyzer", "settings",
-        "preferences", "c9"
+        "preferences", "c9", "tabManager", "dialog.question"
     ];
     main.provides = ["language.codeintel"];
     return main;
@@ -15,6 +15,10 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var language = imports.language;
         var c9 = imports.c9;
+        var tabs = imports.tabManager;
+        var settings = imports.settings;
+        var question = imports["dialog.question"];
+        var notInstalled = options.notInstalled;
         var plugin = new Plugin("Ajax.org", main.consumes);
         var server = require("text!./server/codeintel_server.py")
             .replace(/ {4}/g, " ").replace(/'/g, "'\\''");
@@ -54,8 +58,38 @@ define(function(require, exports, module) {
                     launchCommand: launchCommand,
                     hosted: !options.testing && c9.hosted
                 });
+                handler.on("not_installed", onNotInstalled);
             }
         });
+        
+        function onNotInstalled(e) {
+            if (notInstalled || settings.getBool("project/codeintel/@dismiss_installer"))
+                return;
+                
+            question.show(
+                "Code Intelligence",
+                "Code completion is available for the language you are currently working with.",
+                "To install it on your own host, please follow our installation guide. Would you like to open the guide now?",
+                onYes,
+                onNo,
+                {
+                    showDontAsk: true,
+                    yes: "Open installation guide",
+                    no: "Not now",
+                }
+            );
+            
+            function onYes() {
+                if (question.dontAsk)
+                    settings.set("project/codeintel/@dismiss_installer", true);
+                window.open("https://github.com/c9/c9.ide.language.codeintel/blob/master/README.md", "_blank");
+            }
+            
+            function onNo() {
+                if (question.dontAsk)
+                    settings.set("project/codeintel/@dismiss_installer", true);
+            }
+        }
         
         plugin.on("unload", function() {
             
