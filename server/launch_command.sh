@@ -10,44 +10,16 @@ FALLBACKENV="$HOME/.c9/python2"
 
 if [[ -d $SHAREDENV/lib/python2.7/site-packages/codeintel ]]; then
     ENV=$SHAREDENV
-    source $ENV/bin/activate
-    PYTHON="$ENV/bin/python"
-elif which virtualenv &>/dev/null; then
-    if [ ! -e /usr/include/python2.7/Python.h ]; then
-        echo "!!Code completion fatal error: python-dev not installed (try sudo apt-get install python-dev)"
-        exit 1
-    fi
-
+else
     ENV=$FALLBACKENV
     if ! [[ -d $ENV ]]; then
-        virtualenv $ENV
+        echo "!!Not installed" >&2
+        exit 1
     fi
-
-    source $ENV/bin/activate
-
-    if ! python -c 'import codeintel' &>/dev/null; then
-        echo "!!Installing code completion daemon for $LANGUAGE. This may take a few minutes." >&2
-        set -x
-        if [ "$(uname)" == Darwin ]; then
-            pip install codeintel==0.9.3
-        else
-            rm -rf /tmp/codeintel $ENV/build
-            mkdir /tmp/codeintel
-            cd /tmp/codeintel
-            pip install --download /tmp/codeintel codeintel==0.9.3 2>&1
-            tar xf CodeIntel-0.9.3.tar.gz
-            mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
-            tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
-            pip install -U --no-index --find-links=/tmp/codeintel codeintel
-        fi
-        echo "!!Done installing code completion daemon for $LANGUAGE!" >&2
-    fi
-
-    PYTHON=$ENV/bin/python
-else
-    echo "!!Code completion fatal error: virtualenv not installed, try 'pip install virtualenv' or 'sudo pip install virtualenv'" >&2
-    exit 1
 fi
+
+source $ENV/bin/activate
+PYTHON="$ENV/bin/python"
 
 COMMAND=${COMMAND/\$PYTHON/$PYTHON}
 COMMAND=${COMMAND/\$ENV/$ENV}

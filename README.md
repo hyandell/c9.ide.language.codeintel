@@ -68,6 +68,8 @@ and work out of the box.
    pip install -U --no-index --find-links=/tmp/codeintel codeintel
    ```
 
+6. Reload Cloud9.
+
 ## OSX
 
 1. Run the following command to install virtualenv.
@@ -76,7 +78,7 @@ and work out of the box.
    sudo pip install virtualenv
    ```
 
-2. Once virtualenv is installed, reload Cloud9 to install codeintel.
+2. Reload Cloud9.
 
 ## Windows
 

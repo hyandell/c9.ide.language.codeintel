@@ -194,17 +194,20 @@ function ensureDaemon(language, callback) {
                 if (/!!Daemon listening/.test(data)) {
                     done();
                 }
-                else if (/!!(Updating .*|Installing .*)/.test(data)) {
+                else if (/^!!(Updating .*|Installing .*)/.test(data)) {
                     var message = RegExp.$1;
                     clearTimeout(lastInfoTimer);
                     lastInfoTimer = setTimeout(function() {
                         lastInfoPopup = workerUtil.showInfo(message, 5000);
                     }, 3000);
                 }
-                else if (/!!Done(.*)/.test(data)) {
+                else if (/^!!Done(.*)/.test(data)) {
                     if (lastInfoPopup)
                         workerUtil.showInfo(RegExp.$1, 3000);
                     lastInfoPopup = null;
+                }
+                else if (/^!!Not installed/.test(data)) {
+                    handler.getEmitter().emit("not_installed");
                 }
                 else if (/^!!/.test(data)) {
                     workerUtil.showError(data);
