@@ -1,1 +1,83 @@
 # c9.ide.language.codeintel
+
+Provides code completion using the codeintel plugin ported from the Open Komodo Editor.
+
+https://pypi.python.org/pypi/CodeIntel
+
+## Installation
+
+## Cloud9 hosted workspaces
+
+On normal Cloud9 workspaces, all dependencies of this plugin are installed
+and work out of the box.
+
+## Linux
+
+1. Install pip
+
+   Most Linux distributions these days have pip already installed.
+   If not, the following command should help you install it.
+   Otherwise, there's always Google.
+   
+   ```
+   sudo easy_install pip
+   ```
+   
+2. Make sure pip is up-to-date
+   
+   ```
+   sudo pip install -U pip
+   ```
+
+3. Install and setup virtualenv
+
+   ```
+   sudo pip install -U virtualenv
+   virtualenv --python=python2 $HOME/.c9/python2
+   source $HOME/.c9/python2/bin/activate
+   ```
+
+4. Install codeintel dependencies
+
+   For Debian/Ubuntu-flavored distributions, type:
+   
+   ```
+   sudo apt-get update
+   sudo apt-get install python-dev
+   ```
+
+   For other flavors of Linux, see:
+
+   http://stackoverflow.com/questions/8282231/ubuntu-i-have-python-but-gcc-cant-find-python-h
+
+4. Download codeintel
+
+   ```
+   mkdir /tmp/codeintel
+   pip install --download /tmp/codeintel codeintel==0.9.3
+   ```
+
+5. Install codeintel
+
+   Before installation, we patch codeintel to work on Linux.
+
+   ```
+   tar xf CodeIntel-0.9.3.tar.gz
+   mv CodeIntel-0.9.3/SilverCity CodeIntel-0.9.3/silvercity
+   tar czf CodeIntel-0.9.3.tar.gz CodeIntel-0.9.3
+   pip install -U --no-index --find-links=/tmp/codeintel codeintel
+   ```
+
+## OSX
+
+1. Run the following command to install virtualenv.
+
+   ```
+   sudo pip install virtualenv
+   ```
+
+2. Once virtualenv is installed, reload Cloud9 to install codeintel.
+
+## Windows
+
+Unfortunately Windows is not supported at this time.
