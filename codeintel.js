@@ -6,7 +6,7 @@
 define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "language", "jsonalyzer", "settings",
-        "preferences", "c9", "tabManager", "dialog.question"
+        "preferences", "c9", "dialog.question"
     ];
     main.provides = ["language.codeintel"];
     return main;
@@ -15,15 +15,16 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var language = imports.language;
         var c9 = imports.c9;
-        var tabs = imports.tabManager;
         var settings = imports.settings;
         var question = imports["dialog.question"];
-        var notInstalled = options.notInstalled;
+        var preinstalled = options.preinstalled;
         var plugin = new Plugin("Ajax.org", main.consumes);
         var server = require("text!./server/codeintel_server.py")
             .replace(/ {4}/g, " ").replace(/'/g, "'\\''");
         var launchCommand = require("text!./server/launch_command.sh")
             .replace(/ {2,}/g, " ");
+        
+        var showedInstaller = false;
         
         var CATALOGS = [
             {"lang": "PHP", "name": "PECL", "description": "A collection of PHP Extensions"},
@@ -63,8 +64,9 @@ define(function(require, exports, module) {
         });
         
         function onNotInstalled(e) {
-            if (notInstalled || settings.getBool("project/codeintel/@dismiss_installer"))
+            if (preinstalled || showedInstaller || settings.getBool("project/codeintel/@dismiss_installer"))
                 return;
+            showedInstaller = true;
                 
             question.show(
                 "Code Intelligence",
