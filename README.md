@@ -50,14 +50,14 @@ and work out of the box.
 
    http://stackoverflow.com/questions/8282231/ubuntu-i-have-python-but-gcc-cant-find-python-h
 
-4. Download codeintel
+5. Download codeintel
 
    ```
    mkdir /tmp/codeintel
    pip install --download /tmp/codeintel codeintel==0.9.3
    ```
 
-5. Install codeintel
+6. Install codeintel
 
    Before installation, we patch codeintel to work on Linux.
 
@@ -68,7 +68,7 @@ and work out of the box.
    pip install -U --no-index --find-links=/tmp/codeintel codeintel
    ```
 
-6. Reload Cloud9.
+7. Reload Cloud9.
 
 ## OSX
 
