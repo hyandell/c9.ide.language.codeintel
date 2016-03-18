@@ -15,6 +15,7 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var language = imports.language;
         var c9 = imports.c9;
+        var preferences = imports.preferences;
         var settings = imports.settings;
         var question = imports["dialog.question"];
         var preinstalled = options.preinstalled;
@@ -48,20 +49,48 @@ define(function(require, exports, module) {
         
         plugin.on("load", function() {
             // FIXME: language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/ruby_completer", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/css_less_completer", onLoad, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoadHandler, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoadHandler, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/css_less_completer", onLoadHandler, plugin);
+
+            preferences.add({
+                "Project": {
+                    "Language Support" : {
+                        "PHP Completion Include Paths" : {
+                            position: 200,
+                            type: "textbox",
+                            width: 300,
+                            path: "project/php/@path",
+                        }
+                    }
+                }
+            }, plugin);
             
-            function onLoad(err, handler) {
-                if (err) return console.error(err);
+            settings.on("read", function(e) {
+                settings.setDefaults("project/php", [
+                    ["path", options.paths.php]
+                ]);
+            }, plugin);
+        });
+            
+        function onLoadHandler(err, handler) {
+            if (err) return console.error(err);
+            
+            settings.on("project/php", sendSettings);
+            handler.on("not_installed", onNotInstalled);
+            sendSettings();
+            
+            function sendSettings() {
                 handler.emit("setup", {
                     server: server,
                     launchCommand: launchCommand,
-                    hosted: !options.testing && c9.hosted
+                    hosted: !options.testing && c9.hosted,
+                    paths: {
+                        php: settings.get("project/php/@path"),
+                    },
                 });
-                handler.on("not_installed", onNotInstalled);
             }
-        });
+        }
         
         function onNotInstalled(e) {
             if (preinstalled || showedInstaller || settings.getBool("project/codeintel/@dismiss_installer"))

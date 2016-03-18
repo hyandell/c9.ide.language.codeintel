@@ -47,6 +47,7 @@ var LANGUAGES = {
 
 var handler = module.exports = Object.create(baseHandler);
 var languages = [];
+var paths = {};
 var server;
 var launchCommand;
 var daemon;
@@ -68,6 +69,7 @@ handler.init = function(callback) {
     emitter.on("setup", function(e) {
         server = e.server;
         launchCommand = e.launchCommand;
+        paths = e.paths;
     });
     callback();
 };
@@ -127,6 +129,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
                     + "&row=" + pos.row + "&column=" + pos.column
                     + "&language=" + LANGUAGES[options.language]
                     + "&path=" + encodeURIComponent(path.replace(/^\//, ""))
+                    + "&dirs=" + (paths[options.language] || "").replace(/:/g, ",")
                     + (options.noDoc ? "&nodoc=1" : ""),
                 ],
             },
