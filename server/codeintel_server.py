@@ -53,7 +53,7 @@ def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
     if trigger is None:
         return []
-    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 10)
+    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 120)
     if results is None:
         return []
     return [
