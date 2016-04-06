@@ -56,13 +56,18 @@ define(function(require, exports, module) {
             preferences.add({
                 "Project": {
                     "Language Support" : {
+                        "PHP": {
+                            position: 400,
+                            type: "label",
+                            caption: "PHP:",
+                        },
                         "Enable PHP code completion": {
-                            position: 200,
+                            position: 410,
                             type: "checkbox",
                             path: "project/php/@completion",
                         },
                         "PHP Completion Include Paths" : {
-                            position: 210,
+                            position: 420,
                             type: "textbox",
                             width: 300,
                             path: "project/php/@path",
