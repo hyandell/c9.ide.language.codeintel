@@ -50,6 +50,7 @@ var languages = [];
 var paths = {};
 var server;
 var launchCommand;
+var enabled;
 var daemon;
 var lastInfoTimer;
 var lastInfoPopup;
@@ -70,12 +71,14 @@ handler.init = function(callback) {
         server = e.server;
         launchCommand = e.launchCommand;
         paths = e.paths;
+        enabled = e.enabled;
     });
     callback();
 };
 
 handler.onDocumentOpen = function(path, doc, oldPath, callback) {
     if (!launchCommand) return callback();
+    
     ensureDaemon(handler.language, callback);
 };
 
@@ -83,6 +86,8 @@ handler.onDocumentOpen = function(path, doc, oldPath, callback) {
  * Complete code at the current cursor position.
  */
 handler.complete = function(doc, fullAst, pos, options, callback) {
+    if (!enabled) return callback();
+    
     if (options.language === "PHP" && !options.identifierPrefix && (!options.line[pos.column - 1] || " " === options.line[pos.column - 1]))
         return callback(new Error("Warning: codeintel doesn't support empty-prefix completions"));
     
@@ -105,6 +110,8 @@ handler.complete = function(doc, fullAst, pos, options, callback) {
  * Jump to the definition of what's under the cursor.
  */
 handler.jumpToDefinition = function(doc, fullAst, pos, options, callback) {
+    if (!enabled) return callback();
+    
     callDaemon("definitions", handler.path, doc, pos, options, callback);
 };
 

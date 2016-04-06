@@ -56,8 +56,13 @@ define(function(require, exports, module) {
             preferences.add({
                 "Project": {
                     "Language Support" : {
-                        "PHP Completion Include Paths" : {
+                        "Enable PHP code completion": {
                             position: 200,
+                            type: "checkbox",
+                            path: "project/php/@completion",
+                        },
+                        "PHP Completion Include Paths" : {
+                            position: 210,
                             type: "textbox",
                             width: 300,
                             path: "project/php/@path",
@@ -68,7 +73,8 @@ define(function(require, exports, module) {
             
             settings.on("read", function(e) {
                 settings.setDefaults("project/php", [
-                    ["path", options.paths.php]
+                    ["path", options.paths.php],
+                    ["completion", true],
                 ]);
             }, plugin);
         });
@@ -85,6 +91,7 @@ define(function(require, exports, module) {
                     server: server,
                     launchCommand: launchCommand,
                     hosted: !options.testing && c9.hosted,
+                    enabled: settings.get("project/php/@completion"),
                     paths: {
                         php: settings.get("project/php/@path"),
                     },
