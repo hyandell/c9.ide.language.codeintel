@@ -105,7 +105,8 @@ define(function(require, exports, module) {
         }
         
         function onNotInstalled(e) {
-            if (preinstalled || showedInstaller || settings.getBool("project/codeintel/@dismiss_installer"))
+            if (preinstalled || showedInstaller || e.language === "CSS"
+                || settings.getBool("project/codeintel/@dismiss_installer"))
                 return;
             showedInstaller = true;
                 
@@ -125,6 +126,7 @@ define(function(require, exports, module) {
             function onYes() {
                 if (question.dontAsk)
                     settings.set("project/codeintel/@dismiss_installer", true);
+                // Open guide in a new window (it's blocked from opening in an iframe)
                 window.open("https://github.com/c9/c9.ide.language.codeintel/blob/master/README.md", "_blank");
             }
             

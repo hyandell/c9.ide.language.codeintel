@@ -79,7 +79,7 @@ handler.init = function(callback) {
 handler.onDocumentOpen = function(path, doc, oldPath, callback) {
     if (!launchCommand) return callback();
     
-    ensureDaemon(handler.language, callback);
+    ensureDaemon(callback);
 };
 
 /**
@@ -120,7 +120,9 @@ handler.jumpToDefinition = function(doc, fullAst, pos, options, callback) {
  * so we use curl to send a request.
  */
 function callDaemon(command, path, doc, pos, options, callback) {
-    ensureDaemon(handler.language, function(err, dontRetry) {
+    ensureDaemon(function(err, dontRetry) {
+        if (daemon && daemon.notInstalled)
+            handler.getEmitter().emit("not_installed", { language: options.language });
         if (err) return callback(err);
         
         var start = Date.now();
@@ -165,7 +167,7 @@ function callDaemon(command, path, doc, pos, options, callback) {
  * Make sure we're running our codeintel server.
  * It listens on a port in the workspace container or host.
  */
-function ensureDaemon(language, callback) {
+function ensureDaemon(callback) {
     if (daemon)
         return done(daemon.err, true);
 
@@ -173,7 +175,8 @@ function ensureDaemon(language, callback) {
         err: new Error("Still starting daemon, enhance your calm"),
         kill: function() {
             this.killed = true;
-        }
+        },
+        notInstalled: false,
     };
     
     workerUtil.spawn(
@@ -181,7 +184,7 @@ function ensureDaemon(language, callback) {
         {
             args: [
                 "-c", launchCommand,
-                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT, language
+                "--", "$PYTHON -c '" + server + "' daemon --port " + DAEMON_PORT
             ],
         },
         function(err, child) {
@@ -217,7 +220,7 @@ function ensureDaemon(language, callback) {
                     lastInfoPopup = null;
                 }
                 else if (/^!!Not installed/.test(data)) {
-                    handler.getEmitter().emit("not_installed");
+                    daemon.notInstalled = true;
                 }
                 else if (/^!!/.test(data)) {
                     workerUtil.showError(data);
