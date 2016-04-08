@@ -3,7 +3,6 @@
 set -e
 
 COMMAND=$1
-LANGUAGE=$2
 
 SHAREDENV="/mnt/shared/lib/python2"
 FALLBACKENV="$HOME/.c9/python2"

@@ -56,8 +56,18 @@ define(function(require, exports, module) {
             preferences.add({
                 "Project": {
                     "Language Support" : {
+                        "PHP": {
+                            position: 400,
+                            type: "label",
+                            caption: "PHP:",
+                        },
+                        "Enable PHP code completion": {
+                            position: 410,
+                            type: "checkbox",
+                            path: "project/php/@completion",
+                        },
                         "PHP Completion Include Paths" : {
-                            position: 200,
+                            position: 420,
                             type: "textbox",
                             width: 300,
                             path: "project/php/@path",
@@ -68,7 +78,8 @@ define(function(require, exports, module) {
             
             settings.on("read", function(e) {
                 settings.setDefaults("project/php", [
-                    ["path", options.paths.php]
+                    ["path", options.paths.php],
+                    ["completion", true],
                 ]);
             }, plugin);
         });
@@ -85,6 +96,7 @@ define(function(require, exports, module) {
                     server: server,
                     launchCommand: launchCommand,
                     hosted: !options.testing && c9.hosted,
+                    enabled: settings.get("project/php/@completion"),
                     paths: {
                         php: makeAbsolutePaths(settings.get("project/php/@path")),
                     },
@@ -101,7 +113,8 @@ define(function(require, exports, module) {
         }
         
         function onNotInstalled(e) {
-            if (preinstalled || showedInstaller || settings.getBool("project/codeintel/@dismiss_installer"))
+            if (preinstalled || showedInstaller || e.language === "CSS"
+                || settings.getBool("project/codeintel/@dismiss_installer"))
                 return;
             showedInstaller = true;
                 
@@ -121,6 +134,7 @@ define(function(require, exports, module) {
             function onYes() {
                 if (question.dontAsk)
                     settings.set("project/codeintel/@dismiss_installer", true);
+                // Open guide in a new window (it's blocked from opening in an iframe)
                 window.open("https://github.com/c9/c9.ide.language.codeintel/blob/master/README.md", "_blank");
             }
             
