@@ -86,9 +86,17 @@ define(function(require, exports, module) {
                     launchCommand: launchCommand,
                     hosted: !options.testing && c9.hosted,
                     paths: {
-                        php: settings.get("project/php/@path"),
+                        php: makeAbsolutePaths(settings.get("project/php/@path")),
                     },
                 });
+            }
+            
+            function makeAbsolutePaths(pathSetting) {
+                return pathSetting.split(":").map(function(path) {
+                    if (["/", "~", "\\"].indexOf(path[0]) > -1 || path[1] === ":")
+                        return path;
+                    return c9.workspaceDir + "/" + path;
+                }).join(":");
             }
         }
         
