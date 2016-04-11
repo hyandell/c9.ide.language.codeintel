@@ -64,7 +64,7 @@ define(function(require, exports, module) {
         });
         
         function onNotInstalled(e) {
-            if (preinstalled || showedInstaller || e.language === "CSS"
+            if (preinstalled || showedInstaller || e.language === "css"
                 || settings.getBool("project/codeintel/@dismiss_installer"))
                 return;
             showedInstaller = true;
