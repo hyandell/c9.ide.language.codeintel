@@ -15,6 +15,7 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var language = imports.language;
         var c9 = imports.c9;
+        var preferences = imports.preferences;
         var settings = imports.settings;
         var question = imports["dialog.question"];
         var preinstalled = options.preinstalled;
@@ -48,20 +49,68 @@ define(function(require, exports, module) {
         
         plugin.on("load", function() {
             // FIXME: language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/ruby_completer", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoad, plugin);
-            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/css_less_completer", onLoad, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/codeintel_worker", onLoadHandler, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/php_completer", onLoadHandler, plugin);
+            language.registerLanguageHandler("plugins/c9.ide.language.codeintel/worker/css_less_completer", onLoadHandler, plugin);
+
+            preferences.add({
+                "Project": {
+                    "Language Support" : {
+                        "PHP": {
+                            position: 400,
+                            type: "label",
+                            caption: "PHP:",
+                        },
+                        "Enable PHP code completion": {
+                            position: 410,
+                            type: "checkbox",
+                            path: "project/php/@completion",
+                        },
+                        "PHP Completion Include Paths" : {
+                            position: 420,
+                            type: "textbox",
+                            width: 300,
+                            path: "project/php/@path",
+                        }
+                    }
+                }
+            }, plugin);
             
-            function onLoad(err, handler) {
-                if (err) return console.error(err);
+            settings.on("read", function(e) {
+                settings.setDefaults("project/php", [
+                    ["path", options.paths.php],
+                    ["completion", true],
+                ]);
+            }, plugin);
+        });
+            
+        function onLoadHandler(err, handler) {
+            if (err) return console.error(err);
+            
+            settings.on("project/php", sendSettings);
+            handler.on("not_installed", onNotInstalled);
+            sendSettings();
+            
+            function sendSettings() {
                 handler.emit("setup", {
                     server: server,
                     launchCommand: launchCommand,
-                    hosted: !options.testing && c9.hosted
+                    hosted: !options.testing && c9.hosted,
+                    enabled: settings.get("project/php/@completion"),
+                    paths: {
+                        php: makeAbsolutePaths(settings.get("project/php/@path")),
+                    },
                 });
-                handler.on("not_installed", onNotInstalled);
             }
-        });
+            
+            function makeAbsolutePaths(pathSetting) {
+                return pathSetting.split(":").map(function(path) {
+                    if (["/", "~", "\\"].indexOf(path[0]) > -1 || path[1] === ":")
+                        return path;
+                    return c9.workspaceDir + "/" + path;
+                }).join(":");
+            }
+        }
         
         function onNotInstalled(e) {
             if (preinstalled || showedInstaller || e.language === "css"

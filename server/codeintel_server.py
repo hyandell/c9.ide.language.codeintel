@@ -53,7 +53,7 @@ def get_completions(buffer, line, offset):
     trigger = buffer.preceding_trg_from_pos(offset, offset)
     if trigger is None:
         return []
-    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 10)
+    results = buffer.cplns_from_trg(trigger, ctlr = LoggingEvalController(), timeout = 120)
     if results is None:
         return []
     return [
@@ -124,10 +124,16 @@ def process_input(source, args):
     path = args.get("path")
     basedir = args.get("basedir")
     language = args.get("language")
+    dirs = args.get("dirs")
     catalogs = args.get("catalogs").split(",") if args.get("catalogs") else []
     
     env = manager.env = DefaultEnvironment()
     env.set_pref("codeintel_selected_catalogs", catalogs)
+    env.set_pref("extra_module_dirs", dirs)
+    env.set_pref("phpExtraPaths", dirs)
+    env.set_pref("codeintel_scan_extra_dir", dirs)
+    env.set_pref("codeintel_scan_files_in_project", True)
+    
     env.get_proj_base_dir = lambda: basedir
     buffer = manager.buf_from_content(source + "\n", language, path = path, env = env)
     lines = source.split('\n')
@@ -195,5 +201,6 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, help="The port for the daemon to listen on")
     parser.add_argument("--nodoc", help="Don't include docstrings in output")
     parser.add_argument("--catalogs", help="Catalogs to include (comma-separated)")
+    parser.add_argument("--dirs", help="Directories to include (comma-separated)")
     args = parser.parse_args()
     main(args)
