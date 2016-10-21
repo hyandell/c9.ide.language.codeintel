@@ -71,6 +71,16 @@ define(function(require, exports, module) {
                             type: "textbox",
                             width: 300,
                             path: "project/php/@path",
+                        },
+                        "Format Code on Save": {
+                            position: 430,
+                            type: "checkbox",
+                            path: "project/format/@php_enabled",
+                        },
+                        "Custom Code Formatter": {
+                            position: 440,
+                            type: "textbox",
+                            path: "project/format/@php_formatter",
                         }
                     }
                 }
