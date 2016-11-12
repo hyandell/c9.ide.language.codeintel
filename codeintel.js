@@ -55,18 +55,14 @@ define(function(require, exports, module) {
 
             preferences.add({
                 "Project": {
-                    "Language Support" : {
-                        "PHP": {
-                            position: 400,
-                            type: "label",
-                            caption: "PHP:",
-                        },
+                    "PHP Support": {
+                        position: 1200,
                         "Enable PHP code completion": {
                             position: 410,
                             type: "checkbox",
                             path: "project/php/@completion",
                         },
-                        "PHP Completion Include Paths" : {
+                        "PHP Completion Include Paths": {
                             position: 420,
                             type: "textbox",
                             width: 300,
@@ -75,12 +71,12 @@ define(function(require, exports, module) {
                         "Format Code on Save": {
                             position: 430,
                             type: "checkbox",
-                            path: "project/format/@php_enabled",
+                            path: "project/php/@formatOnSave",
                         },
                         "Custom Code Formatter": {
                             position: 440,
                             type: "textbox",
-                            path: "project/format/@php_formatter",
+                            path: "project/php/@formatter",
                         }
                     }
                 }
