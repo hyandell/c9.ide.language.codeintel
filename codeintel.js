@@ -28,9 +28,9 @@ define(function(require, exports, module) {
         var showedInstaller = false;
         
         var CATALOGS = [
-            {"lang": "PHP", "name": "PECL", "description": "A collection of PHP Extensions"},
-            {"lang": "PHP", "name": "Drupal", "description": "A full-featured PHP content management/discussion engine"},
-            {"lang": "Ruby", "name": "Rails", "description": "Rails"},
+            { "lang": "PHP", "name": "PECL", "description": "A collection of PHP Extensions" },
+            { "lang": "PHP", "name": "Drupal", "description": "A full-featured PHP content management/discussion engine" },
+            { "lang": "Ruby", "name": "Rails", "description": "Rails" },
             /*
             {"lang": "Python", "name": "PyWin32", "description": "Python Extensions for Windows"},
             {"lang": "Python3", "name": "PyWin32 (Python3)", "description": "Python Extensions for Windows"},

@@ -18,7 +18,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
         var isCompleterOpen = helpers.isCompleterOpen;
         var getCompletionCalls = helpers.getCompletionCalls;
 
-        describe("analysis", function(){
+        describe("analysis", function() {
             var jsTab;
             var jsSession;
             
@@ -65,7 +65,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
                     tabs.focusTab(tab);
                     // We get a tab, but it's not done yet, so we wait
                     setTimeout(function() {
-                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 } });
+                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 }});
                         tab.editor.ace.onTextInput(" f");
                         afterCompleteOpen(function(el) {
                             expect.html(el).text(/font-/);
@@ -82,7 +82,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
                     tabs.focusTab(tab);
                     // We get a tab, but it's not done yet, so we wait
                     setTimeout(function() {
-                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 } });
+                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 }});
                         tab.editor.ace.onTextInput("f");
                         afterCompleteOpen(function(el) {
                             assert(el.textContent.match(/font-size/), el.textContent);
@@ -99,7 +99,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
                     tabs.focusTab(tab);
                     // We get a tab, but it's not done yet, so we wait
                     setTimeout(function() {
-                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 } });
+                        tab.editor.ace.selection.setSelectionRange({ start: { row: 1, column: 4 }, end: { row: 1, column: 4 }});
                         tab.editor.ace.onTextInput("font-f");
                         afterCompleteOpen(function(el) {
                             expect.html(el).text(/font-family/);
@@ -119,7 +119,7 @@ require(["plugins/c9.ide.language/test_base"], function(base) {
                             return;
                         imports.worker.off("setCompletionRegex", onRegex);
                         
-                        tab.editor.ace.selection.setSelectionRange({ start: { row: 17, column: 5 }, end: { row: 17, column: 5 } });
+                        tab.editor.ace.selection.setSelectionRange({ start: { row: 17, column: 5 }, end: { row: 17, column: 5 }});
                         tab.editor.ace.onTextInput("-");
                         tab.editor.ace.onTextInput(">");
                         afterCompleteOpen(function(el) {
